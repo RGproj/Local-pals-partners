@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalPals — Partner Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #F8F6F2;
+  --white:    #FFFFFF;
+  --ink:      #161412;
+  --ink-2:    #3D3830;
+  --ink-3:    #7A7268;
+  --rule:     rgba(22,20,18,0.12);
+  --rule-2:   rgba(22,20,18,0.06);
+  --accent:   #B5561E;
+  --accent-bg:#FDF0E8;
+  --green:    #2D6B3E;
+  --green-bg: #EEF6F0;
+  --mono:     'IBM Plex Mono', monospace;
+  --serif:    'Libre Baskerville', serif;
+  --sans:     'DM Sans', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+.page-wrap{max-width:860px;margin:0 auto;padding:0 24px;}
+
+/* TOPBAR */
+.topbar{border-bottom:1px solid var(--rule);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;background:var(--white);position:sticky;top:0;z-index:50;}
+.topbar-brand{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.04em;color:var(--ink);}
+.topbar-brand span{color:var(--accent);}
+.topbar-tag{font-family:var(--mono);font-size:11px;font-weight:300;color:var(--ink-3);letter-spacing:0.06em;text-transform:uppercase;}
+
+/* HEADER */
+.doc-header{padding:64px 0 56px;border-bottom:1px solid var(--rule);}
+.doc-header .meta{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.doc-header .meta::before{content:'';display:block;width:28px;height:1px;background:var(--accent);}
+.doc-header h1{font-family:var(--serif);font-size:clamp(30px,5vw,44px);font-weight:400;line-height:1.12;letter-spacing:-0.01em;color:var(--ink);margin-bottom:12px;}
+.doc-header .subtitle{font-family:var(--mono);font-size:13px;color:var(--ink-3);letter-spacing:0.04em;margin-bottom:28px;}
+.doc-header .intro{font-size:16px;font-weight:300;color:var(--ink-2);line-height:1.75;max-width:600px;padding-top:20px;border-top:1px solid var(--rule-2);}
+
+/* SECTIONS */
+.doc-section{padding:52px 0;border-bottom:1px solid var(--rule);}
+.sec-num{font-family:var(--mono);font-size:11px;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px;}
+.sec-title{font-family:var(--serif);font-size:clamp(20px,3vw,27px);font-weight:400;color:var(--ink);margin-bottom:28px;line-height:1.2;}
+
+/* TWO-COL */
+.two-col{display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--white);}
+.two-col-label{padding:16px 20px;background:var(--bg);border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:flex-start;}
+.two-col-content{padding:16px 20px;border-bottom:1px solid var(--rule);font-size:14px;font-weight:300;color:var(--ink-2);line-height:1.65;}
+.two-col>*:nth-last-child(-n+2){border-bottom:none;}
+
+/* CLEAN LIST */
+.clean-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.clean-list li{padding:14px 18px;background:var(--white);border:1px solid var(--rule);border-radius:2px;font-size:14px;font-weight:300;color:var(--ink-2);display:flex;gap:14px;align-items:flex-start;line-height:1.55;}
+.clean-list li::before{content:'—';color:var(--accent);font-family:var(--mono);font-size:12px;flex-shrink:0;margin-top:1px;}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--white);}
+.step{display:grid;grid-template-columns:56px 1fr;border-bottom:1px solid var(--rule);}
+.step:last-child{border-bottom:none;}
+.step-num{font-family:var(--mono);font-size:18px;font-weight:300;color:var(--accent);padding:18px 0 18px 20px;display:flex;align-items:flex-start;border-right:1px solid var(--rule);}
+.step-body{padding:18px 20px;}
+.step-body h3{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px;}
+.step-body p{font-size:13px;font-weight:300;color:var(--ink-3);line-height:1.6;}
+
+/* NOTICE */
+.notice{padding:16px 18px;background:var(--accent-bg);border-left:2px solid var(--accent);border-radius:0 2px 2px 0;font-size:13px;font-weight:300;color:var(--ink-2);line-height:1.65;margin-top:16px;}
+.notice strong{font-weight:500;color:var(--accent);}
+
+/* COMMISSION CARDS */
+.commission-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;}
+.commission-card{border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--white);}
+.commission-card-head{padding:12px 16px;background:var(--ink);display:flex;align-items:center;justify-content:space-between;}
+.commission-card-head .rate{font-family:var(--mono);font-size:22px;font-weight:300;color:var(--white);}
+.commission-card-head .badge{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);}
+.commission-card-body{padding:14px 16px;}
+.commission-card-body h4{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:6px;}
+.commission-card-body p{font-size:12.5px;font-weight:300;color:var(--ink-3);line-height:1.55;}
+.commission-card.preferred .commission-card-head{background:var(--accent);}
+.commission-card.preferred .commission-card-head .badge{color:rgba(255,255,255,0.7);}
+
+/* MODEL TABLE */
+.model-table{width:100%;border-collapse:collapse;border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--white);font-size:13.5px;}
+.model-table thead tr{background:var(--ink);}
+.model-table thead th{padding:13px 16px;text-align:left;font-family:var(--mono);font-size:11px;font-weight:400;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.65);}
+.model-table thead th:first-child{color:var(--white);}
+.model-table tbody tr{border-bottom:1px solid var(--rule);}
+.model-table tbody tr:last-child{border-bottom:none;}
+.model-table tbody tr:hover{background:var(--bg);}
+.model-table td{padding:16px;vertical-align:top;font-weight:300;color:var(--ink-2);line-height:1.55;}
+.model-table td:first-child{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--accent);white-space:nowrap;}
+.model-table td ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.model-table td li::before{content:'→ ';color:var(--ink-3);font-family:var(--mono);font-size:11px;}
+
+/* OB STEPS */
+.ob-steps{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--white);}
+.ob-step{padding:24px 18px;border-right:1px solid var(--rule);}
+.ob-step:last-child{border-right:none;}
+.ob-step-num{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;color:var(--ink-3);text-transform:uppercase;margin-bottom:12px;}
+.ob-step h3{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:6px;}
+.ob-step p{font-size:12.5px;font-weight:300;color:var(--ink-3);line-height:1.55;}
+
+/* FORM */
+.form-outer{background:var(--white);border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+.form-section-head{padding:14px 20px;background:var(--bg);border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:10px;}
+.form-section-head span{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-2);}
+.form-body{padding:24px 20px;border-bottom:1px solid var(--rule);}
+.form-body:last-child{border-bottom:none;}
+.field-grid{display:grid;grid-template-columns:1fr;gap:16px;}
+.field-grid.two{grid-template-columns:1fr 1fr;}
+.field-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);}
+.field label .req,.req-star{color:var(--accent);}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--rule);border-radius:2px;font-family:var(--sans);font-size:14px;font-weight:300;color:var(--ink);outline:none;transition:border-color 0.15s,background 0.15s;appearance:none;-webkit-appearance:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px rgba(181,86,30,0.08);}
+.field input::placeholder,.field textarea::placeholder{color:var(--ink-3);font-weight:300;}
+.field textarea{min-height:88px;resize:vertical;line-height:1.6;}
+.field select{background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237A7268' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;cursor:pointer;}
+
+.radio-set,.check-set{display:flex;flex-direction:column;gap:8px;}
+.radio-opt,.check-opt{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:1px solid var(--rule);border-radius:2px;cursor:pointer;transition:background 0.15s,border-color 0.15s;background:var(--bg);}
+.radio-opt:hover,.check-opt:hover{background:var(--accent-bg);border-color:rgba(181,86,30,0.3);}
+.radio-opt input,.check-opt input{width:auto;padding:0;margin-top:2px;flex-shrink:0;accent-color:var(--accent);}
+.radio-opt-body h4{font-size:13.5px;font-weight:500;color:var(--ink);margin-bottom:2px;}
+.radio-opt-body p{font-size:12px;font-weight:300;color:var(--ink-3);line-height:1.45;}
+.check-opt span{font-size:13.5px;font-weight:300;color:var(--ink-2);}
+.rate-badge{margin-left:auto;flex-shrink:0;font-family:var(--mono);font-size:10px;font-weight:500;background:var(--accent);color:var(--white);padding:2px 7px;border-radius:2px;letter-spacing:0.05em;align-self:center;}
+
+/* FILE DROP */
+.file-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;background:var(--bg);border:1.5px dashed rgba(22,20,18,0.18);border-radius:2px;text-align:center;cursor:pointer;transition:border-color 0.15s,background 0.15s;}
+.file-drop:hover{border-color:var(--accent);background:var(--accent-bg);}
+.file-drop p{font-size:13.5px;font-weight:300;color:var(--ink-2);}
+.file-drop small{font-size:12px;color:var(--ink-3);margin-top:4px;display:block;}
+.file-drop input[type="file"]{display:none;}
+
+/* T&C */
+.tnc-box{background:var(--white);border:1px solid var(--rule);border-radius:2px;overflow:hidden;}
+.tnc-scroll{max-height:280px;overflow-y:auto;padding:24px;font-size:12.5px;font-weight:300;color:var(--ink-3);line-height:1.8;border-bottom:1px solid var(--rule);}
+.tnc-scroll::-webkit-scrollbar{width:4px;}
+.tnc-scroll::-webkit-scrollbar-thumb{background:var(--rule);border-radius:2px;}
+.tnc-scroll h4{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-2);margin:20px 0 8px;}
+.tnc-scroll h4:first-child{margin-top:0;}
+.tnc-scroll p{margin-bottom:10px;}
+.tnc-checks{padding:20px 24px;display:flex;flex-direction:column;gap:10px;}
+.tnc-check{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--rule);border-radius:2px;cursor:pointer;transition:background 0.15s;background:var(--bg);}
+.tnc-check:hover{background:var(--accent-bg);}
+.tnc-check input{width:auto;padding:0;margin-top:3px;flex-shrink:0;accent-color:var(--accent);}
+.tnc-check-body span{font-size:13px;font-weight:400;color:var(--ink);display:block;margin-bottom:2px;}
+.tnc-check-body small{font-size:12px;font-weight:300;color:var(--ink-3);line-height:1.4;}
+
+/* SIGNATURE */
+.sig-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.sig-field{display:flex;flex-direction:column;gap:5px;}
+.sig-field label{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);}
+.sig-field input{width:100%;padding:10px 13px;background:var(--bg);border:1px solid var(--rule);border-radius:2px;font-family:var(--sans);font-size:14px;font-weight:300;color:var(--ink);outline:none;transition:border-color 0.15s;}
+.sig-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(181,86,30,0.08);background:var(--white);}
+
+/* SUBMIT */
+.btn-submit{width:100%;padding:15px;background:var(--ink);color:var(--white);border:none;border-radius:2px;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;margin-top:20px;}
+.btn-submit:hover{background:var(--accent);}
+.btn-submit:disabled{background:var(--ink-3);cursor:not-allowed;}
+
+/* SUCCESS */
+#successState{display:none;background:var(--green-bg);border:1px solid #B2D8BB;border-radius:2px;padding:28px 24px;text-align:center;margin-bottom:24px;}
+#successState.show{display:block;}
+#successState h4{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.06em;color:var(--green);text-transform:uppercase;margin-bottom:8px;}
+#successState p{font-size:14px;font-weight:300;color:#3D5A42;}
+
+/* FINAL */
+.final-block{background:var(--ink);padding:36px 32px;border-radius:2px;margin:52px 0;}
+.final-block h3{font-family:var(--serif);font-size:20px;font-weight:400;font-style:italic;color:var(--white);margin-bottom:12px;}
+.final-block p{font-size:14px;font-weight:300;color:rgba(248,246,242,0.6);line-height:1.75;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--rule);padding:24px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.footer-left{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.04em;}
+.footer-left a{color:var(--ink-3);text-decoration:none;}
+.footer-left a:hover{color:var(--accent);}
+.footer-right{font-family:var(--mono);font-size:11px;color:var(--ink-3);}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .two-col{grid-template-columns:1fr;}
+  .two-col-label{border-right:none;border-bottom:1px solid var(--rule);padding-bottom:8px;}
+  .ob-steps{grid-template-columns:1fr 1fr;}
+  .ob-step{border-bottom:1px solid var(--rule);}
+  .ob-step:nth-child(even){border-right:none;}
+  .ob-step:nth-last-child(-n+2){border-bottom:none;}
+  .field-grid.two,.field-grid.three{grid-template-columns:1fr;}
+  .commission-grid{grid-template-columns:1fr;}
+  .sig-row{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  .ob-steps{grid-template-columns:1fr;}
+  .ob-step{border-right:none!important;border-bottom:1px solid var(--rule)!important;}
+  .ob-step:last-child{border-bottom:none!important;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">Local<span>Pals</span></div>
+  <div class="topbar-tag">Partner Document · Confidential</div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="meta">Document</div>
+    <h1>LocalPals Partner Model</h1>
+    <div class="subtitle">How we work with selected experience providers</div>
+    <p class="intro">LocalPals connects international guests staying in villas and apartments in Croatia with a curated network of trusted local partners. This document outlines how the partnership works, the applicable business models, and the onboarding process.</p>
+  </div>
+
+  <!-- 01 WHAT WE DO -->
+  <div class="doc-section">
+    <div class="sec-num">01</div>
+    <h2 class="sec-title">What We Do</h2>
+    <div class="two-col">
+      <div class="two-col-label">Guest requests</div>
+      <div class="two-col-content">We source and qualify booking requests from international guests staying in private accommodations across Croatia. Partners receive confirmed, vetted inquiries — not raw leads.</div>
+      <div class="two-col-label">Communication</div>
+      <div class="two-col-content">All guest communication is managed by LocalPals from first inquiry to booking confirmation. Partners are not required to handle inbound requests directly.</div>
+      <div class="two-col-label">Distribution</div>
+      <div class="two-col-content">Selected partners are featured in curated digital catalogs and printed guest guides placed inside villas and boutique accommodations. Placement is editorial, not paid.</div>
+      <div class="two-col-label">Quality standards</div>
+      <div class="two-col-content">We maintain a limited and actively managed partner network. Reliability, response quality and guest experience are monitored on an ongoing basis.</div>
+    </div>
+  </div>
+
+  <!-- 02 HOW IT WORKS -->
+  <div class="doc-section">
+    <div class="sec-num">02</div>
+    <h2 class="sec-title">How the Model Works</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">01</div><div class="step-body"><h3>Guest contacts LocalPals</h3><p>Guest makes an inquiry via the LocalPals concierge channel — digital catalog, printed guide, or direct outreach.</p></div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body"><h3>LocalPals matches and qualifies</h3><p>We select the appropriate partner based on availability, category, guest profile and location. The guest is not redirected to the partner at this stage.</p></div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body"><h3>Booking handled through LocalPals</h3><p>LocalPals confirms availability, closes the booking, and manages payment per the agreed model. The booking flow is controlled by LocalPals.</p></div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body"><h3>Partner receives confirmed booking</h3><p>Partner is notified with full details — guest count, date, time, location, special requirements.</p></div></div>
+      <div class="step"><div class="step-num">05</div><div class="step-body"><h3>Partner delivers the service</h3><p>Partner executes the service. Payment is settled per the agreed model. Guest feedback is collected by LocalPals.</p></div></div>
+    </div>
+    <div class="notice"><strong>Note:</strong> LocalPals controls the booking flow end to end. Partners do not communicate pricing, availability or payment terms directly with guests unless explicitly agreed in advance.</div>
+  </div>
+
+  <!-- 03 BUSINESS MODEL -->
+  <div class="doc-section">
+    <div class="sec-num">03</div>
+    <h2 class="sec-title">Business Model</h2>
+    <p style="font-size:14px;font-weight:300;color:var(--ink-2);margin-bottom:20px;line-height:1.7;">We operate with two models depending on service category and partner preference. The applicable model is confirmed during onboarding.</p>
+    <div style="overflow-x:auto;">
+      <table class="model-table">
+        <thead><tr><th>Model</th><th>Name</th><th>How it works</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>A</td>
+            <td style="font-weight:400;color:var(--ink);">Full Payment</td>
+            <td><ul><li>Guest pays LocalPals in full</li><li>Partner receives agreed share after service confirmation</li><li>Commission deducted at settlement</li></ul></td>
+          </tr>
+          <tr>
+            <td>B</td>
+            <td style="font-weight:400;color:var(--ink);">Deposit + Balance</td>
+            <td><ul><li>Guest pays deposit to LocalPals</li><li>LocalPals retains agreed commission from deposit</li><li>Partner receives advance / deposit share</li><li>Remaining balance paid directly to partner at time of service</li></ul></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:28px;">
+      <p style="font-size:13px;font-weight:500;font-family:var(--mono);letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:12px;">Commission Structure</p>
+      <div class="commission-grid">
+        <div class="commission-card">
+          <div class="commission-card-head"><span class="rate">20%</span><span class="badge">Standard Rate</span></div>
+          <div class="commission-card-body"><h4>Standard Commission</h4><p>Applies to all partners by default. Deducted at settlement per the agreed payment model.</p></div>
+        </div>
+        <div class="commission-card preferred">
+          <div class="commission-card-head"><span class="rate">10%</span><span class="badge">Preferred Rate</span></div>
+          <div class="commission-card-body"><h4>Partner Benefit Rate</h4><p>For partners who commit to offering a recurring benefit to LocalPals guests. Agreed and documented during onboarding. See Section 05.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 REQUIREMENTS -->
+  <div class="doc-section">
+    <div class="sec-num">04</div>
+    <h2 class="sec-title">Partner Requirements</h2>
+    <ul class="clean-list">
+      <li>Responsive and reliable communication — confirmation within agreed response windows</li>
+      <li>Consistent service quality aligned with the standard communicated during onboarding</li>
+      <li>Clear and stable pricing — no unannounced changes after booking confirmation</li>
+      <li>Ability to handle international guests, including non-Croatian speakers</li>
+      <li>Accurate availability management — no cancellations after confirmed bookings without exceptional cause</li>
+    </ul>
+  </div>
+
+  <!-- 05 GUEST BENEFITS -->
+  <div class="doc-section">
+    <div class="sec-num">05</div>
+    <h2 class="sec-title">LocalPals Guest Benefits</h2>
+    <p style="font-size:14px;font-weight:300;color:var(--ink-2);margin-bottom:20px;line-height:1.7;">Partners who commit to offering a recurring benefit to LocalPals guests qualify for the <strong style="font-weight:500;color:var(--accent);">10% preferred commission rate</strong> instead of the standard 20%. This is agreed in advance and documented as part of the partner agreement.</p>
+    <div class="two-col">
+      <div class="two-col-label">Examples</div>
+      <div class="two-col-content">Small discount on standard rate · Complimentary upgrade · Added value item (welcome drink, extra time, additional service element) · Special menu addition</div>
+      <div class="two-col-label">Conditions</div>
+      <div class="two-col-content">Any benefit is agreed in advance with partner approval. Partners may opt out of this arrangement at any time with 30 days notice, reverting to the standard 20% rate.</div>
+    </div>
+  </div>
+
+  <!-- 06 DISTRIBUTION -->
+  <div class="doc-section">
+    <div class="sec-num">06</div>
+    <h2 class="sec-title">Distribution</h2>
+    <ul class="clean-list">
+      <li><strong style="font-weight:500;color:var(--ink);">Digital catalogs</strong> — curated service guides distributed to guests prior to and during their stay</li>
+      <li><strong style="font-weight:500;color:var(--ink);">Printed guest guides</strong> — premium printed materials placed inside participating villas and boutique accommodations</li>
+      <li><strong style="font-weight:500;color:var(--ink);">Direct concierge recommendation</strong> — personal recommendation by the LocalPals team during active guest interactions</li>
+    </ul>
+    <div class="notice">Feature placement is editorial, not paid. It reflects partner quality and fit with active guest demand.</div>
+  </div>
+
+  <!-- 07 ONBOARDING PROCESS -->
+  <div class="doc-section">
+    <div class="sec-num">07</div>
+    <h2 class="sec-title">Onboarding Process</h2>
+    <div class="ob-steps">
+      <div class="ob-step"><div class="ob-step-num">Step 01</div><h3>Submit details</h3><p>Complete the form below with your business and service information.</p></div>
+      <div class="ob-step"><div class="ob-step-num">Step 02</div><h3>Review</h3><p>LocalPals reviews your submission against current category needs and quality standards.</p></div>
+      <div class="ob-step"><div class="ob-step-num">Step 03</div><h3>Approval</h3><p>If selected, we confirm terms, the applicable payment model and commission rate.</p></div>
+      <div class="ob-step"><div class="ob-step-num">Step 04</div><h3>Activation</h3><p>Partner profile activated. You begin receiving confirmed booking requests.</p></div>
+    </div>
+    <div class="notice">Review typically takes <strong>3–5 business days</strong>. We respond to all submissions.</div>
+  </div>
+
+  <!-- 08 FORM -->
+  <div class="doc-section">
+    <div class="sec-num">08</div>
+    <h2 class="sec-title">Partner Application</h2>
+
+    <div id="successState">
+      <h4>Application received</h4>
+      <p>Thank you. Our team will review your submission and respond within 3–5 business days.</p>
+    </div>
+
+    <form id="partnerForm" action="https://formspree.io/f/xreyrgqo" method="POST" novalidate>
+      <div class="form-outer">
+
+        <!-- A Business Details -->
+        <div class="form-section-head"><span>A — Business Details</span></div>
+        <div class="form-body">
+          <div class="field-grid">
+            <div class="field-grid two">
+              <div class="field"><label>Business Name <span class="req">*</span></label><input type="text" name="business_name" placeholder="Legal or trading name" required></div>
+              <div class="field"><label>Contact Person <span class="req">*</span></label><input type="text" name="contact_person" placeholder="Full name" required></div>
+              <div class="field"><label>Email <span class="req">*</span></label><input type="email" name="email" placeholder="contact@yourbusiness.com" required></div>
+              <div class="field"><label>Phone / WhatsApp <span class="req">*</span></label><input type="tel" name="phone" placeholder="+385 __ ___ ____" required></div>
+              <div class="field"><label>Website</label><input type="url" name="website" placeholder="https://..."></div>
+              <div class="field"><label>Instagram</label><input type="text" name="instagram" placeholder="@handle"></div>
+            </div>
+            <div class="field"><label>Street Address <span class="req">*</span></label><input type="text" name="address_street" placeholder="Street name and number" required></div>
+            <div class="field-grid three">
+              <div class="field"><label>City <span class="req">*</span></label><input type="text" name="address_city" placeholder="e.g. Split" required></div>
+              <div class="field"><label>Postal Code <span class="req">*</span></label><input type="text" name="address_zip" placeholder="e.g. 21000" required></div>
+              <div class="field"><label>Country</label><input type="text" name="address_country" placeholder="Croatia"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- B Service Details -->
+        <div class="form-section-head"><span>B — Service Details</span></div>
+        <div class="form-body">
+          <div class="field-grid">
+            <div class="field-grid two">
+              <div class="field"><label>Service Type <span class="req">*</span></label>
+                <select name="service_type" required>
+                  <option value="" disabled selected>Select category</option>
+                  <option>Wine Tours</option><option>Private Chef</option><option>Boat Experiences</option>
+                  <option>Wellness</option><option>Transfers</option><option>Curated Local Experience</option><option>Other</option>
+                </select>
+              </div>
+              <div class="field"><label>Primary Service Area <span class="req">*</span></label><input type="text" name="service_area" placeholder="e.g. Split, Hvar, Brač" required></div>
+            </div>
+            <div class="field"><label>Service Description <span class="req">*</span></label><textarea name="description" placeholder="What you offer, what makes it distinct, who it suits best." required></textarea></div>
+            <div class="field-grid two">
+              <div class="field"><label>Languages Spoken</label><input type="text" name="languages" placeholder="e.g. English, Croatian, Italian"></div>
+              <div class="field"><label>Capacity (max guests)</label><input type="text" name="capacity" placeholder="e.g. Up to 12 guests"></div>
+              <div class="field"><label>Price Range</label><input type="text" name="price_range" placeholder="e.g. €150–€300 per person"></div>
+              <div class="field"><label>Booking Notice Required</label>
+                <select name="booking_notice">
+                  <option value="" disabled selected>Select lead time</option>
+                  <option>Same day</option><option>24 hours</option><option>48 hours</option><option>72 hours</option><option>1 week+</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- C Operations -->
+        <div class="form-section-head"><span>C — Operations</span></div>
+        <div class="form-body">
+          <div class="field-grid">
+            <div class="field"><label>Availability</label><textarea name="availability" placeholder="Seasonal availability, days of operation, any blackout periods." style="min-height:72px;"></textarea></div>
+            <div class="field-grid two">
+              <div class="field"><label>Response Time</label>
+                <select name="response_time">
+                  <option value="" disabled selected>Typical response</option>
+                  <option>Within 1 hour</option><option>Within 3 hours</option><option>Within 24 hours</option><option>Within 48 hours</option>
+                </select>
+              </div>
+              <div class="field"><label>Preferred Contact</label>
+                <select name="contact_method">
+                  <option value="" disabled selected>Best channel</option>
+                  <option>WhatsApp</option><option>Email</option><option>Phone</option><option>Any</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Preferred Payment Model <span class="req">*</span></label>
+              <div class="radio-set">
+                <label class="radio-opt"><input type="radio" name="payment_model" value="A" required>
+                  <div class="radio-opt-body"><h4>Model A — Full Payment</h4><p>Guest pays LocalPals in full. You receive agreed share after service confirmation.</p></div>
+                </label>
+                <label class="radio-opt"><input type="radio" name="payment_model" value="B">
+                  <div class="radio-opt-body"><h4>Model B — Deposit + Balance</h4><p>Guest pays deposit to LocalPals. You receive advance. Balance settled directly at service.</p></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- D Guest Benefits -->
+        <div class="form-section-head"><span>D — LocalPals Guest Benefits &amp; Commission Rate</span></div>
+        <div class="form-body">
+          <div class="notice" style="margin-top:0;margin-bottom:16px;">Partners who commit to offering a guest benefit qualify for the <strong>10% preferred commission rate</strong>. Standard rate is 20%.</div>
+          <div class="field-grid">
+            <div class="field">
+              <label>Commission preference <span class="req">*</span></label>
+              <div class="radio-set">
+                <label class="radio-opt"><input type="radio" name="offer_benefit" value="yes_commit" id="benefit_yes">
+                  <div class="radio-opt-body"><h4>I commit to offering a guest benefit — 10% rate</h4><p>Specific benefit type agreed during onboarding review. Documented in partner agreement.</p></div>
+                </label>
+                <label class="radio-opt"><input type="radio" name="offer_benefit" value="no_standard">
+                  <div class="radio-opt-body"><h4>Standard rate — 20%</h4><p>No guest benefit commitment required.</p></div>
+                </label>
+              </div>
+            </div>
+            <div class="field" id="benefitTypesField" style="display:none;">
+              <label>Type of benefit I can offer (select all that apply) <span class="req">*</span></label>
+              <div class="check-set">
+                <label class="check-opt"><input type="checkbox" name="benefit" value="discount"><span>Small discount on standard rate</span><span class="rate-badge">10%</span></label>
+                <label class="check-opt"><input type="checkbox" name="benefit" value="upgrade"><span>Complimentary upgrade</span><span class="rate-badge">10%</span></label>
+                <label class="check-opt"><input type="checkbox" name="benefit" value="addon"><span>Complimentary add-on / extra item</span><span class="rate-badge">10%</span></label>
+                <label class="check-opt"><input type="checkbox" name="benefit" value="welcome"><span>Welcome drink or welcome item</span><span class="rate-badge">10%</span></label>
+                <label class="check-opt"><input type="checkbox" name="benefit" value="time"><span>Extra time or service extension</span><span class="rate-badge">10%</span></label>
+                <label class="check-opt"><input type="checkbox" name="benefit" value="other" id="benefit_other_check"><span>Other</span><span class="rate-badge">10%</span></label>
+              </div>
+            </div>
+            <div class="field" id="benefitOtherField" style="display:none;">
+              <label>Describe your benefit offer</label>
+              <textarea name="benefit_other_text" placeholder="Describe the benefit you can offer to LocalPals guests." style="min-height:72px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- E Media -->
+        <div class="form-section-head"><span>E — Media</span></div>
+        <div class="form-body">
+          <div class="field-grid">
+            <div class="field">
+              <label>Upload Photos</label>
+              <label class="file-drop" for="photoUpload">
+                <p>Click to upload or drag files here</p>
+                <small>JPG / PNG · Up to 10MB each · 3–8 images recommended</small>
+                <input type="file" id="photoUpload" name="photos" accept="image/*" multiple>
+              </label>
+            </div>
+            <div class="field"><label>Links to Visual Content</label><textarea name="media_links" placeholder="Dropbox, Google Drive, Instagram highlight URL, video link, etc." style="min-height:72px;"></textarea></div>
+          </div>
+        </div>
+
+        <!-- F Terms -->
+        <div class="form-section-head"><span>F — Terms &amp; Partner Agreement</span></div>
+        <div class="form-body">
+          <p style="font-size:13px;font-weight:300;color:var(--ink-3);margin-bottom:16px;line-height:1.7;">Please read the following terms carefully and confirm your agreement before submitting.</p>
+          <div class="tnc-box">
+            <div class="tnc-scroll">
+
+              <h4>1. General Agreement</h4>
+              <p>By submitting this application, the Partner agrees to work with LocalPals under the terms described in this document — including the applicable commission structure, payment model, and service standards communicated during onboarding. LocalPals acts as an intermediary between guests and partners and does not bear liability for the Partner's service delivery.</p>
+
+              <h4>2. Bookings &amp; Commission</h4>
+              <p>All bookings are handled through LocalPals. The Partner agrees to the commission rate selected in this application (20% standard or 10% preferred) and will not circumvent the LocalPals booking flow by arranging direct commercial transactions with LocalPals guests outside of confirmed bookings.</p>
+
+              <h4>3. Data Processing &amp; GDPR</h4>
+              <p>LocalPals (Bottom Line Advisory d.o.o.) processes Partner data in accordance with EU data protection law (GDPR — Regulation (EU) 2016/679). Data submitted via this form will be stored in the LocalPals partner database and used for partner relationship management, booking coordination, and communications. The Partner may request access, correction or deletion of their data at any time by contacting LocalPals at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c4aca1a8a8ab84a8aba7a5a8e9b4a5a8b7eaa7aba9">[email&#160;protected]</a>.</p>
+
+              <h4>4. Communications &amp; Catalog Inclusion</h4>
+              <p>The Partner consents to receiving operational communications from LocalPals (email, WhatsApp) and to their business details and visual content being included in LocalPals digital and printed guest materials. Both consents may be withdrawn at any time in writing. Governing law: Republic of Croatia.</p>
+
+            </div>
+            <div class="tnc-checks">
+              <label class="tnc-check"><input type="checkbox" id="agree_terms" name="agree_terms" required>
+                <div class="tnc-check-body"><span>I have read and agree to the LocalPals Partner Terms</span><small>Service standards, booking flow, commission structure, cancellation policy.</small></div>
+              </label>
+              <label class="tnc-check"><input type="checkbox" id="agree_gdpr" name="agree_gdpr" required>
+                <div class="tnc-check-body"><span>I consent to data processing under GDPR (Section 5)</span><small>My business data will be stored and used by Bottom Line Advisory d.o.o. for partner relationship management.</small></div>
+              </label>
+              <label class="tnc-check"><input type="checkbox" id="agree_comms" name="agree_comms" required>
+                <div class="tnc-check-body"><span>I consent to receiving communications from LocalPals</span><small>Email and messaging communications related to bookings, updates and catalog inclusion.</small></div>
+              </label>
+              <label class="tnc-check"><input type="checkbox" id="agree_database" name="agree_database" required>
+                <div class="tnc-check-body"><span>I consent to inclusion in the LocalPals partner database and guest catalogs</span><small>My business details and visual content may be featured in digital and printed LocalPals materials.</small></div>
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;">
+            <p style="font-size:12px;font-family:var(--mono);letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:12px;">Digital Confirmation</p>
+            <div class="sig-row">
+              <div class="sig-field"><label>Full Name (as signature) <span class="req-star">*</span></label><input type="text" name="sig_name" placeholder="Type your full name to confirm" required></div>
+              <div class="sig-field"><label>Date</label><input type="text" name="sig_date" id="sig_date" readonly></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /form-outer -->
+      <button type="submit" class="btn-submit" id="submitBtn">Submit Application</button>
+    </form>
+  </div>
+
+  <!-- FINAL NOTE -->
+  <div class="final-block">
+    <h3>On how we select partners.</h3>
+    <p>LocalPals works with a limited number of partners per service category. We do not operate as an open marketplace. Submissions are reviewed individually against current demand and quality requirements. We prioritise long-term collaboration over volume. If your application is not accepted at this stage, it may be because the category is currently full — not a reflection of service quality.</p>
+  </div>
+
+  <footer>
+    <div class="footer-left">LocalPals · local-pals.com · <a href="/cdn-cgi/l/email-protection#98eaf7fdfdd8f4f7fbf9f4b5e8f9f4ebb6fbf7f5"><span class="__cf_email__" data-cfemail="9deff2f8f8ddf1f2fefcf1b0edfcf1eeb3fef2f0">[email&#160;protected]</span></a><br>An initiative by Bottom Line Advisory d.o.o, Croatia.</div>
+    <div class="footer-right">© 2025 LocalPals</div>
+  </footer>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Auto date
+  const d = new Date();
+  document.getElementById('sig_date').value = d.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+
+  // Show benefit fields when 10% rate selected
+  document.querySelectorAll('input[name="offer_benefit"]').forEach(r => {
+    r.addEventListener('change', function() {
+      const show = this.value === 'yes_commit';
+      document.getElementById('benefitTypesField').style.display = show ? 'block' : 'none';
+      if (!show) document.getElementById('benefitOtherField').style.display = 'none';
+    });
+  });
+
+  // Show free-text field when "Other" is checked
+  document.getElementById('benefit_other_check').addEventListener('change', function() {
+    document.getElementById('benefitOtherField').style.display = this.checked ? 'block' : 'none';
+  });
+
+  // File upload
+  document.getElementById('photoUpload').addEventListener('change', function() {
+    const n = this.files.length;
+    if (n > 0) this.closest('.file-drop').querySelector('p').textContent = n + ' file' + (n > 1 ? 's' : '') + ' selected';
+  });
+
+  // Submit
+  document.getE
